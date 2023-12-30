@@ -1,6 +1,8 @@
 package structs
 
-import "github.com/golang-jwt/jwt/v5"
+import (
+	"github.com/golang-jwt/jwt/v5"
+)
 
 type UserSiginUp struct {
 	FirstName       string `json:"first_name"`
@@ -21,4 +23,12 @@ type JwtUserClaims struct {
 	Email     string `json:"email"`
 	Admin     bool   `json:"admin"`
 	jwt.Claims
+}
+
+type Product struct {
+	ProductName  string `json:"product_name"`
+	Price        string `json:"price"`
+	ProductMedia string `json:"media"`
+	Description  string `json:"description"`
+	Offers       string `json:"offers"`
 }

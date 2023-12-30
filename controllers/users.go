@@ -3,9 +3,12 @@ package controllers
 import (
 	"e_commerce_backend/helper"
 	"e_commerce_backend/models"
+	"e_commerce_backend/services"
 	"e_commerce_backend/structs"
 	"e_commerce_backend/utilities"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func SignUp(data structs.UserSiginUp) (returnData utilities.ResponseJson) {
@@ -68,5 +71,39 @@ func SignIn(data structs.UserSignIn) (returnData utilities.ResponseJson) {
 	} else {
 		utilities.ErrorResponse(&returnData, "Email and Passwod does not match")
 	}
+	return
+}
+
+func AddProduct(data structs.Product) (returnData utilities.ResponseJson) {
+
+	array := services.GetVectorSearch(data.ProductName)
+	result, err := models.AddProduct(&models.Product{
+		Id:                   primitive.NewObjectID(),
+		ProductName:          data.ProductName,
+		Description:          data.Description,
+		Price:                data.Price,
+		Offers:               data.Offers,
+		ProductMedia:         data.ProductMedia,
+		ProductNameEmbedding: array,
+	})
+
+	if err != nil {
+		utilities.ErrorResponse(&returnData, "Failed to add product")
+		return
+	}
+
+	utilities.SuccessResponse(&returnData, result)
+
+	return
+}
+
+func GetProductById(productId string) (returnData utilities.ResponseJson) {
+	product, err := models.GetProductById(productId)
+
+	if err != nil {
+		utilities.ErrorResponse(&returnData, "No Product Found with this ID")
+		return
+	}
+	utilities.SuccessResponse(&returnData, product)
 	return
 }

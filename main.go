@@ -19,6 +19,11 @@ func main() {
 	router.POST("/v1/signup", handlers.SignUp)
 	router.POST("/v1/signin", handlers.SignIn)
 	// Sellers
+	router.POST("/v1/seller/addproduct", handlers.AddProduct)
+	router.GET("/v1/seller/getProductsById", handlers.GetProductById)
+	// Search Functionalities
+	router.GET("/v1/user/search", handlers.SearchProducts)
+	router.GET("/v1/user/addProductToCart", handlers.AddProductToCart)
 
 	router.Run()
 }

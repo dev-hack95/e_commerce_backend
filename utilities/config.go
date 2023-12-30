@@ -2,6 +2,8 @@ package utilities
 
 import (
 	"context"
+	"log"
+	"time"
 
 	"github.com/beego/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
@@ -35,24 +37,19 @@ func EnableSQLDatabasesConfiguration() {
 	}
 }
 
-func EnableNoSqlDatabaseConfiguration() (*mongo.Client, error) {
-	// Viper essential config
-	viper.SetConfigName("env")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./conf")
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
-	}
+func GetDBInstance() (*mongo.Client, error) {
+	uri := "mongodb://192.168.29.186:27017/products"
+	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 
-	if viper.Get("local.mongo") != nil {
-		mongoConf := viper.Get("local.mongo").(map[string]interface{})
-		uri := "mongo+srv://" + mongoConf["user"].(string) + ":" + mongoConf["password"].(string) + "@" + mongoConf["host"].(string) + mongoConf["database"].(string)
-		client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
-		if err != nil {
-			panic(err)
-		}
-		return client, nil
+	if err != nil {
+		log.Fatal(err)
 	}
-	return nil, err
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	err = client.Connect(ctx)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return client, nil
 }
